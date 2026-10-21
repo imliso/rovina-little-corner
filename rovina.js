@@ -1,6 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from "./config.js";
-import { ROVINA_PROFILE } from "./rovina-profile.js?v=6";
+import { ROVINA_PROFILE } from "./rovina-profile.js?v=7";
 
 const BUCKET = "friend-photos";
 const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
@@ -43,9 +43,9 @@ let toastTimer;
 let factIndex = 0;
 
 const fallbackFacts = [
-  "This little corner of the internet was made just for Rovina.",
-  "The bestie council has officially declared Rovina the main character here.",
-  "A Rovina appreciation page is, by definition, an excellent idea."
+  "From Lalisa's POV: Rovina is one of the kindest people I know.",
+  "She's sweet to everyone—and she makes it feel effortless.",
+  "She's seriously smart, but never makes anyone feel small."
 ];
 
 function showToast(message) {

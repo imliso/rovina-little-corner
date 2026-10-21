@@ -18,7 +18,14 @@ export const ROVINA_PROFILE = {
   playlistUrl: "",
   birthday: "09-19",
   birthplace: "Bogor, Indonesia",
-  facts: [],
+  facts: [
+    "From Lalisa's POV: Rovina is one of the kindest people I know.",
+    "She's sweet to everyone—and she makes it feel effortless.",
+    "She's seriously smart, but never makes anyone feel small.",
+    "She has the softest heart and the best energy.",
+    "She notices the little things that make people feel loved.",
+    "I'm lucky to have a friend who is this thoughtful."
+  ],
   socials: {
     instagram: "https://www.instagram.com/rovina_utami/",
     tiktok: "https://www.tiktok.com/@mie_ayaaaam"
