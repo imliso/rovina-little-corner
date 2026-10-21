@@ -9,7 +9,11 @@ export const ROVINA_PROFILE = {
     "Trying lots of new places to eat"
   ],
   music: [
-    { title: "Shepia", artist: "SO7" }
+    {
+      title: "Shepia",
+      artist: "SO7",
+      spotifyUrl: "https://open.spotify.com/track/5gkTGkjFB5wAd3mSBEcQPY"
+    }
   ],
   playlistUrl: "",
   birthday: "09-19",

@@ -1,6 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from "./config.js";
-import { ROVINA_PROFILE } from "./rovina-profile.js?v=5";
+import { ROVINA_PROFILE } from "./rovina-profile.js?v=6";
 
 const BUCKET = "friend-photos";
 const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
@@ -107,9 +107,14 @@ function renderProfile() {
     element.textContent = hobby;
   });
   appendItems(dom.music, ROVINA_PROFILE.music, "music-item", (element, song) => {
-    const title = document.createElement("strong");
-    const artist = document.createElement("span");
+    const title = document.createElement("button");
+    title.className = "music-play-button";
+    title.type = "button";
     title.textContent = song.title;
+    title.dataset.spotifyUrl = song.spotifyUrl || "";
+    title.setAttribute("aria-label", song.spotifyUrl ? `Open ${song.title} in the Spotify player` : song.title);
+    title.setAttribute("aria-pressed", "false");
+    const artist = document.createElement("span");
     artist.textContent = song.artist;
     element.append(title, artist);
   });
@@ -347,6 +352,27 @@ dom.photoInput.addEventListener("change", () => {
 });
 
 document.querySelector("#remove-preview").addEventListener("click", clearSelectedPhoto);
+dom.music.addEventListener("click", (event) => {
+  const button = event.target.closest(".music-play-button");
+  if (!button?.dataset.spotifyUrl) return;
+
+  try {
+    const trackUrl = new URL(button.dataset.spotifyUrl);
+    const trackId = trackUrl.pathname.match(/^\/track\/([A-Za-z0-9]+)\/?$/)?.[1];
+    if (trackUrl.hostname !== "open.spotify.com" || !trackId) return;
+
+    dom.spotifyPlayer.src = `https://open.spotify.com/embed/track/${trackId}?utm_source=generator`;
+    dom.spotifyPlayer.title = `Spotify player for ${button.textContent}`;
+    dom.spotifyEmbed.hidden = false;
+    dom.playlistLink.href = trackUrl.toString();
+    dom.playlistLink.textContent = "Open this track in Spotify ↗";
+    dom.playlistLink.hidden = false;
+    dom.music.querySelectorAll(".music-play-button").forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
+  } catch {
+    showToast("Could not open this Spotify track.");
+  }
+});
+
 document.querySelector("#fact-button").addEventListener("click", () => {
   const facts = ROVINA_PROFILE.facts?.filter(Boolean) || [];
   const options = facts.length ? facts : fallbackFacts;

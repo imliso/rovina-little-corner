@@ -100,7 +100,10 @@ h1 span { color: var(--purple); }
 .hobby-tag { padding: 7px 10px; border: 1px solid rgba(81,61,125,.22); border-radius: 99px; background: rgba(255,253,249,.64); color: #51436e; font-size: 10px; line-height: 1.4; }
 .music-list { display: grid; gap: 9px; }
 .music-item { display: flex; justify-content: space-between; gap: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(81,61,125,.13); font-size: 10px; }
-.music-item strong { font-weight: 700; }
+.music-play-button { padding: 0; border: 0; background: transparent; color: var(--ink); cursor: pointer; font-size: 10px; font-weight: 700; text-align: left; }
+.music-play-button::before { content: "▶"; margin-right: 7px; color: var(--purple); font-size: 8px; }
+.music-play-button:hover { color: var(--plum); text-decoration: underline; text-underline-offset: 3px; }
+.music-play-button[aria-pressed="true"]::before { content: "♫"; }
 .music-item span { color: var(--muted); text-align: right; }
 .playlist-link { display: inline-block; margin-top: 13px; color: var(--plum); font: 500 9px/1.4 var(--mono); text-underline-offset: 3px; }
 .spotify-embed { margin-top: 14px; overflow: hidden; border-radius: 8px; }
