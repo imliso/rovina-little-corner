@@ -1,6 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from "./config.js";
-import { ROVINA_PROFILE } from "./rovina-profile.js?v=4";
+import { ROVINA_PROFILE } from "./rovina-profile.js?v=5";
 
 const BUCKET = "friend-photos";
 const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
