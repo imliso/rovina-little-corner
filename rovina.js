@@ -186,8 +186,6 @@ function makePostCard(post) {
   }
   const footer = document.createElement("div");
   footer.className = "post-footer";
-  const note = document.createElement("span");
-  note.textContent = "A little moment for Rovina ✳";
   const reaction = document.createElement("button");
   reaction.className = "reaction-button";
   reaction.type = "button";
@@ -205,10 +203,11 @@ function makePostCard(post) {
   deleteButton.type = "button";
   deleteButton.dataset.postId = post.id;
   deleteButton.dataset.imagePath = post.image_path || "";
-  deleteButton.textContent = "Delete";
+  deleteButton.textContent = "🗑";
+  deleteButton.title = "Delete post";
   deleteButton.setAttribute("aria-label", `Delete post by ${post.display_name || "a friend"}`);
   controls.append(deleteButton);
-  footer.append(note, controls);
+  footer.append(controls);
   card.append(footer);
   return card;
 }
