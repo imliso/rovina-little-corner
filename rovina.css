@@ -105,6 +105,13 @@ h1 span { color: var(--purple); }
 .music-play-button:hover { color: var(--plum); text-decoration: underline; text-underline-offset: 3px; }
 .music-play-button[aria-pressed="true"]::before { content: "♫"; }
 .music-item span { color: var(--muted); text-align: right; }
+.playlist-library { margin-top: 17px; }
+.playlist-library .panel-kicker { margin-bottom: 8px; }
+.spotify-playlist-list { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.spotify-playlist-item { margin: 0; }
+.playlist-play-button { max-width: 100%; padding: 6px 9px; border: 1px solid #d8cee9; border-radius: 99px; background: rgba(255,253,249,.8); color: var(--plum); cursor: pointer; font: 500 8px/1.35 var(--mono); overflow-wrap: anywhere; }
+.playlist-play-button::before { content: "▶"; margin-right: 5px; color: var(--purple); font-size: 7px; }
+.playlist-play-button:hover, .playlist-play-button[aria-pressed="true"] { border-color: var(--purple); background: var(--lilac); }
 .playlist-link { display: inline-block; margin-top: 13px; color: var(--plum); font: 500 9px/1.4 var(--mono); text-underline-offset: 3px; }
 .spotify-embed { margin-top: 14px; overflow: hidden; border-radius: 8px; }
 .spotify-embed[hidden] { display: none; }

@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="rovina.css?v=5">
+  <link rel="stylesheet" href="rovina.css?v=7">
 </head>
 <body>
   <header class="topbar wrap">
@@ -63,8 +63,12 @@
         <p class="panel-kicker">THE ROVINA SOUNDTRACK</p>
         <h3>On repeat lately</h3>
         <ul id="music-list" class="music-list"></ul>
+        <div class="playlist-library">
+          <p class="panel-kicker">HER PUBLIC PLAYLISTS</p>
+          <ul id="spotify-playlist-list" class="spotify-playlist-list"></ul>
+        </div>
         <div class="spotify-embed" id="spotify-embed" hidden>
-          <iframe id="spotify-player" title="Rovina's Spotify playlist" loading="lazy" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
+          <iframe id="spotify-player" title="Rovina's Spotify player" loading="lazy" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
         </div>
         <a id="playlist-link" class="playlist-link" hidden target="_blank" rel="noopener noreferrer">Open her playlist ↗</a>
       </article>
@@ -126,6 +130,6 @@
     <a href="#top">Back to the top ↑</a>
   </footer>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script type="module" src="rovina.js?v=10"></script>
+  <script type="module" src="rovina.js?v=11"></script>
 </body>
 </html>

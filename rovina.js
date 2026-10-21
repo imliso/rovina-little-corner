@@ -1,7 +1,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { createIcons, Heart, Trash2 } from "https://esm.sh/lucide@0.468.0";
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from "./config.js";
-import { ROVINA_PROFILE } from "./rovina-profile.js?v=7";
+import { ROVINA_PROFILE } from "./rovina-profile.js?v=8";
 
 const BUCKET = "friend-photos";
 const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
@@ -20,6 +20,7 @@ const dom = {
   socialNote: document.querySelector("#social-note"),
   hobbies: document.querySelector("#hobbies-list"),
   music: document.querySelector("#music-list"),
+  spotifyPlaylists: document.querySelector("#spotify-playlist-list"),
   playlistLink: document.querySelector("#playlist-link"),
   spotifyEmbed: document.querySelector("#spotify-embed"),
   spotifyPlayer: document.querySelector("#spotify-player"),
@@ -118,6 +119,16 @@ function renderProfile() {
     const artist = document.createElement("span");
     artist.textContent = song.artist;
     element.append(title, artist);
+  });
+  appendItems(dom.spotifyPlaylists, ROVINA_PROFILE.spotifyPlaylists, "spotify-playlist-item", (element, playlist) => {
+    const button = document.createElement("button");
+    button.className = "playlist-play-button";
+    button.type = "button";
+    button.textContent = playlist.title;
+    button.dataset.spotifyUrl = playlist.url;
+    button.setAttribute("aria-label", `Play playlist ${playlist.title}`);
+    button.setAttribute("aria-pressed", "false");
+    element.append(button);
   });
 
   if (ROVINA_PROFILE.playlistUrl) {
@@ -371,6 +382,28 @@ dom.music.addEventListener("click", (event) => {
     dom.music.querySelectorAll(".music-play-button").forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
   } catch {
     showToast("Could not open this Spotify track.");
+  }
+});
+
+dom.spotifyPlaylists.addEventListener("click", (event) => {
+  const button = event.target.closest(".playlist-play-button");
+  if (!button?.dataset.spotifyUrl) return;
+
+  try {
+    const playlistUrl = new URL(button.dataset.spotifyUrl);
+    const playlistId = playlistUrl.pathname.match(/^\/playlist\/([A-Za-z0-9]+)\/?$/)?.[1];
+    if (playlistUrl.hostname !== "open.spotify.com" || !playlistId) return;
+
+    dom.spotifyPlayer.src = `https://open.spotify.com/embed/playlist/${playlistId}?utm_source=generator`;
+    dom.spotifyPlayer.title = `Spotify player for ${button.textContent}`;
+    dom.spotifyEmbed.hidden = false;
+    dom.playlistLink.href = playlistUrl.toString();
+    dom.playlistLink.textContent = "Open this playlist in Spotify ↗";
+    dom.playlistLink.hidden = false;
+    dom.spotifyPlaylists.querySelectorAll(".playlist-play-button").forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
+    dom.music.querySelectorAll(".music-play-button").forEach((item) => item.setAttribute("aria-pressed", "false"));
+  } catch {
+    showToast("Could not open this Spotify playlist.");
   }
 });
 
