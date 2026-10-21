@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f2effb">
+  <meta name="description" content="A little corner of the internet, all about Rovina.">
+  <title>Rovina's Little Corner</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="rovina.css?v=2">
+</head>
+<body>
+  <header class="topbar wrap">
+    <a class="brand" href="#top" aria-label="Rovina's Little Corner home">
+      <span class="brand-mark" aria-hidden="true">r.</span>
+      <span>ROVINA'S LITTLE CORNER<small>A VERY IMPORTANT PERSON, OBVIOUSLY</small></span>
+    </a>
+    <a class="top-link" href="#feed">THE PHOTO FEED <span aria-hidden="true">↓</span></a>
+  </header>
+
+  <main class="wrap" id="top">
+    <section class="hero" aria-labelledby="rovina-name">
+      <div class="portrait-column">
+        <div class="portrait-frame">
+          <img id="portrait" alt="A photo of Rovina" hidden>
+          <div id="portrait-placeholder" class="portrait-placeholder" aria-hidden="true">
+            <span class="portrait-spark">✳</span>
+            <strong>ROVINA<br>GOES HERE</strong>
+            <small>HER PHOTO, HER RULES</small>
+          </div>
+          <span class="photo-caption">THE ONE AND ONLY · 10/10 HUMAN</span>
+        </div>
+        <button class="sticker sticker-top" id="easter-egg" type="button" aria-label="Open a tiny surprise">certified<br>icon ✳</button>
+        <span class="sticker sticker-bottom" aria-hidden="true">bestie<br>approved ♡</span>
+      </div>
+
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="eyebrow-dot"></span> A tiny internet home for one big personality</p>
+        <h1 id="rovina-name"><span id="rovina-name-text">Rovina</span><span>.</span></h1>
+        <p class="tagline" id="tagline">Main character energy. Supporting character punctuality.</p>
+        <p class="about" id="about">A little page for Rovina: her favorite things, her people, and all the moments worth keeping.</p>
+        <p class="birthplace" id="birthplace"></p>
+        <nav class="social-links" id="social-links" aria-label="Rovina's social media"></nav>
+        <p class="social-note" id="social-note">Her social links will show up here.</p>
+      </div>
+    </section>
+
+    <section class="favorites" aria-label="Rovina's favorite things">
+      <div class="section-heading">
+        <p class="eyebrow">A FIELD GUIDE TO ROVINA</p>
+        <h2>Things she <em>loves.</em></h2>
+      </div>
+      <article class="favorite-panel hobbies-panel">
+        <span class="panel-icon" aria-hidden="true">✿</span>
+        <p class="panel-kicker">WHEN SHE'S NOT BEING ICONIC</p>
+        <h3>Hobbies & little joys</h3>
+        <ul id="hobbies-list" class="tag-list"></ul>
+      </article>
+      <article class="favorite-panel music-panel">
+        <span class="panel-icon" aria-hidden="true">♫</span>
+        <p class="panel-kicker">THE ROVINA SOUNDTRACK</p>
+        <h3>On repeat lately</h3>
+        <ul id="music-list" class="music-list"></ul>
+        <div class="spotify-embed" id="spotify-embed" hidden>
+          <iframe id="spotify-player" title="Rovina's Spotify playlist" loading="lazy" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
+        </div>
+        <a id="playlist-link" class="playlist-link" hidden target="_blank" rel="noopener noreferrer">Open her playlist ↗</a>
+      </article>
+    </section>
+
+    <section class="delight-row" aria-label="Rovina's daily fact and birthday">
+      <article class="daily-fact">
+        <div><p class="panel-kicker">TODAY'S VERY IMPORTANT FACT</p><p id="daily-fact-text" aria-live="polite"></p></div>
+        <button class="fact-button" id="fact-button" type="button">Another fact ✳</button>
+      </article>
+      <article class="birthday-card">
+        <span class="birthday-icon" aria-hidden="true">🎂</span>
+        <div><p class="panel-kicker">THE COUNTDOWN TO ROVINA DAY</p><p class="birthday-count" id="birthday-count">Add her birthday in the profile file</p></div>
+      </article>
+    </section>
+
+    <section class="feed-section" id="feed" aria-labelledby="feed-heading">
+      <div class="feed-heading-row">
+        <div>
+          <p class="eyebrow">THE CAMERA ROLL, BUT MAKE IT PUBLIC</p>
+          <h2 id="feed-heading">Rovina <em>in the wild.</em></h2>
+        </div>
+        <span class="feed-count" id="feed-count">0 MOMENTS</span>
+      </div>
+
+      <div class="feed-layout">
+        <div class="feed-list" id="feed-list" aria-live="polite">
+          <div class="empty-feed" id="empty-feed">
+            <span aria-hidden="true">✳</span>
+            <p>No moments yet. Every legendary feed starts somewhere.</p>
+          </div>
+        </div>
+
+        <form class="post-form" id="post-form">
+          <p class="panel-kicker">ADD TO THE LORE</p>
+          <h3>Drop a photo or memory</h3>
+          <label>Your name <span class="optional">optional</span>
+            <input name="display_name" maxlength="40" placeholder="A friend (or a mysterious admirer)">
+          </label>
+          <label>Caption
+            <textarea name="message" rows="4" maxlength="600" placeholder="A tiny story, a big compliment, or the context behind that photo..."></textarea>
+          </label>
+          <label class="photo-picker">Add a photo <span class="optional">JPG, PNG, WEBP, GIF · max 5 MB</span>
+            <input id="post-photo" type="file" accept="image/jpeg,image/png,image/webp,image/gif">
+          </label>
+          <div class="upload-preview" id="upload-preview" hidden>
+            <img id="upload-preview-image" alt="Selected photo preview">
+            <button class="remove-preview" id="remove-preview" type="button" aria-label="Remove selected photo">×</button>
+          </div>
+          <button class="post-button" id="post-button" type="submit">Post to Rovina's feed <span aria-hidden="true">↗</span></button>
+          <p class="public-note">No account needed. Anyone with this link can add a post, so keep the page link among friends.</p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="wrap footer">
+    <span>Made for Rovina, with an unreasonable amount of affection.</span>
+    <a href="#top">Back to the top ↑</a>
+  </footer>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="rovina.js?v=5"></script>
+</body>
+</html>
