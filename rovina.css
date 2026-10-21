@@ -132,17 +132,21 @@ h1 span { color: var(--purple); }
 .feed-heading-row .eyebrow { margin-bottom: 6px; }
 .feed-count { padding: 7px 10px; border: 1px solid #d9d2e7; border-radius: 99px; color: var(--muted); font: 400 8px/1.4 var(--mono); white-space: nowrap; }
 .feed-layout { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 24px; align-items: start; }
-.feed-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; }
+.feed-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 19px; padding: 5px 3px 10px; }
 .empty-feed { grid-column: 1 / -1; min-height: 190px; display: grid; place-content: center; justify-items: center; padding: 22px; border: 1px dashed #c9bddc; background: rgba(255,253,249,.56); color: var(--muted); text-align: center; }
 .empty-feed span { color: var(--purple); font-size: 24px; }
 .empty-feed p { max-width: 270px; margin: 8px 0 0; font: italic 500 14px/1.6 var(--serif); }
-.feed-card { overflow: hidden; border: 1px solid #ded8e7; border-radius: 4px; background: var(--paper); animation: arrive 300ms ease-out both; }
-.post-meta { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 13px 14px 10px; }
+.feed-card { position: relative; overflow: visible; padding: 10px 10px 8px; border: 1px solid #e4dfeb; border-radius: 2px; background: #fffefa; box-shadow: 0 3px 9px rgba(48,43,64,.12); animation: scrapbook-arrive 300ms ease-out both; transform: rotate(-1.2deg); transition: transform 160ms ease, box-shadow 160ms ease; }
+.feed-card:nth-child(even) { transform: rotate(1.25deg); background: #fffdfb; }
+.feed-card::before { position: absolute; z-index: 1; top: -8px; left: calc(50% - 24px); width: 48px; height: 15px; transform: rotate(-3deg); background: rgba(244,202,220,.72); box-shadow: 0 1px 2px rgba(48,43,64,.08); content: ""; }
+.feed-card:nth-child(even)::before { transform: rotate(4deg); background: rgba(188,168,235,.52); }
+.feed-card:hover { z-index: 2; transform: translateY(-3px) rotate(0); box-shadow: 0 8px 18px rgba(48,43,64,.15); }
+.post-meta { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 4px 3px 10px; }
 .post-meta strong { font-size: 10px; }
 .post-meta time { color: var(--muted); font: 400 8px/1.4 var(--mono); }
-.post-message { margin: 0; padding: 0 14px 12px; color: #5d5868; font-size: 11px; line-height: 1.7; white-space: pre-line; }
-.post-image { display: block; width: 100%; max-height: 340px; object-fit: cover; background: var(--lilac); }
-.post-footer { display: flex; justify-content: flex-end; align-items: center; gap: 8px; padding: 9px 12px 11px; }
+.post-message { margin: 0; padding: 10px 4px 11px; color: #5d5868; font: italic 500 12px/1.6 var(--serif); white-space: pre-line; }
+.post-image { display: block; width: 100%; max-height: 360px; height: auto; object-fit: contain; background: #eee9f5; }
+.post-footer { display: flex; justify-content: flex-end; align-items: center; gap: 8px; padding: 10px 2px 1px; border-top: 1px solid #f0edf3; }
 .reaction-button { display: inline-flex; min-height: 30px; align-items: center; gap: 6px; padding: 5px 9px; border: 1px solid #e3d4ed; border-radius: 99px; background: #fff8fc; color: #a34f79; cursor: pointer; font: 500 10px/1 var(--mono); transition: background-color 120ms ease, border-color 120ms ease; }
 .reaction-button:hover, .reaction-button.reacted { background: #f7dce8; }
 .reaction-button:disabled { cursor: default; }
@@ -153,6 +157,8 @@ h1 span { color: var(--purple); }
 .delete-post-button:hover { border-color: #d9aeb8; background: #f9e9ed; color: #9e4357; }
 .delete-post-button:disabled { cursor: wait; opacity: .65; }
 .reaction-button:focus-visible, .delete-post-button:focus-visible { outline: 2px solid var(--purple); outline-offset: 2px; }
+
+@keyframes scrapbook-arrive { from { opacity: 0; scale: .97; } to { opacity: 1; scale: 1; } }
 
 .post-form { position: sticky; top: 18px; display: grid; gap: 13px; padding: 21px; border: 1px solid #d8cee9; border-radius: 4px; background: #fffdf9; box-shadow: 5px 5px 0 #e5ddf2; }
 .post-form h3 { margin: -4px 0 2px; font-size: 23px; }
@@ -203,7 +209,7 @@ h1 span { color: var(--purple); }
   .feed-count { margin-top: 10px; }
   .feed-layout { grid-template-columns: 1fr; }
   .post-form { position: static; grid-row: 1; }
-  .feed-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .feed-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 13px; }
   .delight-row { grid-template-columns: 1fr; gap: 10px; padding-bottom: 26px; }
   .daily-fact, .birthday-card { min-height: 98px; padding: 15px; }
   .footer { flex-direction: column; gap: 8px; }
