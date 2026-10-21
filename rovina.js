@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createIcons, Heart, Trash2 } from "https://esm.sh/lucide@0.468.0";
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from "./config.js";
 import { ROVINA_PROFILE } from "./rovina-profile.js?v=7";
 
@@ -193,7 +194,7 @@ function makePostCard(post) {
   reaction.dataset.count = String(post.reaction_count || 0);
   reaction.setAttribute("aria-pressed", String(Boolean(post.reacted_by_me)));
   if (post.reacted_by_me) reaction.classList.add("reacted");
-  reaction.innerHTML = `<span aria-hidden="true">♥</span> <span>${reaction.dataset.count}</span>`;
+  reaction.innerHTML = `<i data-lucide="heart" aria-hidden="true"></i><span>${reaction.dataset.count}</span>`;
   reaction.setAttribute("aria-label", `${reaction.dataset.count} hearts for this post`);
   const controls = document.createElement("div");
   controls.className = "post-controls";
@@ -203,7 +204,7 @@ function makePostCard(post) {
   deleteButton.type = "button";
   deleteButton.dataset.postId = post.id;
   deleteButton.dataset.imagePath = post.image_path || "";
-  deleteButton.textContent = "🗑";
+  deleteButton.innerHTML = '<i data-lucide="trash-2" aria-hidden="true"></i>';
   deleteButton.title = "Delete post";
   deleteButton.setAttribute("aria-label", `Delete post by ${post.display_name || "a friend"}`);
   controls.append(deleteButton);
@@ -217,6 +218,7 @@ function renderPosts(posts) {
   dom.emptyFeed.hidden = posts.length > 0;
   dom.feedCount.textContent = `${posts.length} ${posts.length === 1 ? "MOMENT" : "MOMENTS"}`;
   for (const post of posts) dom.feed.insertBefore(makePostCard(post), dom.emptyFeed);
+  createIcons({ icons: { Heart, Trash2 } });
 
   const featuredPhoto = ROVINA_PROFILE.portraitUrl || posts.find((post) => post.image_url)?.image_url;
   if (featuredPhoto) {
@@ -436,7 +438,8 @@ dom.feed.addEventListener("click", async (event) => {
   button.dataset.count = String(count);
   button.setAttribute("aria-pressed", "true");
   button.classList.add("reacted");
-  button.innerHTML = `<span aria-hidden="true">♥</span> <span>${count}</span>`;
+  button.innerHTML = `<i data-lucide="heart" aria-hidden="true"></i><span>${count}</span>`;
+  createIcons({ icons: { Heart, Trash2 } });
   button.setAttribute("aria-label", `${count} hearts for this post`);
 });
 

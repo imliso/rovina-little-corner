@@ -135,14 +135,17 @@ h1 span { color: var(--purple); }
 .post-meta time { color: var(--muted); font: 400 8px/1.4 var(--mono); }
 .post-message { margin: 0; padding: 0 14px 12px; color: #5d5868; font-size: 11px; line-height: 1.7; white-space: pre-line; }
 .post-image { display: block; width: 100%; max-height: 340px; object-fit: cover; background: var(--lilac); }
-.post-footer { display: flex; justify-content: flex-end; align-items: center; gap: 8px; padding: 10px 14px 12px; color: var(--purple); font: 400 8px/1.4 var(--mono); }
-.reaction-button { display: inline-flex; align-items: center; gap: 5px; padding: 5px 8px; border: 1px solid #e3d4ed; border-radius: 99px; background: #fff8fc; color: #a34f79; cursor: pointer; font: 500 10px/1 var(--mono); }
+.post-footer { display: flex; justify-content: flex-end; align-items: center; gap: 8px; padding: 9px 12px 11px; }
+.reaction-button { display: inline-flex; min-height: 30px; align-items: center; gap: 6px; padding: 5px 9px; border: 1px solid #e3d4ed; border-radius: 99px; background: #fff8fc; color: #a34f79; cursor: pointer; font: 500 10px/1 var(--mono); transition: background-color 120ms ease, border-color 120ms ease; }
 .reaction-button:hover, .reaction-button.reacted { background: #f7dce8; }
 .reaction-button:disabled { cursor: default; }
-.post-controls { display: inline-flex; align-items: center; gap: 6px; }
-.delete-post-button { display: grid; width: 30px; height: 28px; place-items: center; padding: 0; border: 1px solid #e6cdd2; border-radius: 50%; background: #fffafa; color: #944c5b; cursor: pointer; font: 400 14px/1 var(--display); }
-.delete-post-button:hover { background: #f8e2e5; }
+.reaction-button .lucide, .delete-post-button .lucide { width: 14px; height: 14px; stroke-width: 2; }
+.reaction-button[aria-pressed="true"] .lucide-heart { fill: currentColor; }
+.post-controls { display: inline-flex; align-items: center; gap: 7px; }
+.delete-post-button { display: grid; width: 32px; height: 32px; place-items: center; padding: 0; border: 1px solid #eadde1; border-radius: 9px; background: #fffdfd; color: #956c79; cursor: pointer; transition: color 120ms ease, border-color 120ms ease, background-color 120ms ease; }
+.delete-post-button:hover { border-color: #d9aeb8; background: #f9e9ed; color: #9e4357; }
 .delete-post-button:disabled { cursor: wait; opacity: .65; }
+.reaction-button:focus-visible, .delete-post-button:focus-visible { outline: 2px solid var(--purple); outline-offset: 2px; }
 
 .post-form { position: sticky; top: 18px; display: grid; gap: 13px; padding: 21px; border: 1px solid #d8cee9; border-radius: 4px; background: #fffdf9; box-shadow: 5px 5px 0 #e5ddf2; }
 .post-form h3 { margin: -4px 0 2px; font-size: 23px; }
