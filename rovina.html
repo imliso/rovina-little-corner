@@ -140,7 +140,24 @@
     <span>Made for Rovina, with love from Lalisa.</span>
     <a href="#top">Back to the top ↑</a>
   </footer>
+  <dialog class="crop-dialog" id="portrait-crop-dialog" aria-labelledby="portrait-crop-title">
+    <div class="crop-dialog-content">
+      <p class="panel-kicker">MAIN PHOTO</p>
+      <h2 id="portrait-crop-title">Crop and adjust</h2>
+      <div class="portrait-crop-stage" id="portrait-crop-stage" aria-label="Drag the photo to adjust its crop">
+        <img id="portrait-crop-image" alt="Photo being cropped">
+      </div>
+      <p class="crop-help">Drag to reposition, then adjust the zoom.</p>
+      <label class="crop-zoom-label" for="portrait-crop-zoom">Zoom
+        <input id="portrait-crop-zoom" type="range" min="1" max="3" step="0.01" value="1">
+      </label>
+      <div class="crop-actions">
+        <button class="crop-cancel" id="portrait-crop-cancel" type="button">Cancel</button>
+        <button class="crop-apply" id="portrait-crop-apply" type="button">Use this crop</button>
+      </div>
+    </div>
+  </dialog>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script type="module" src="rovina.js?v=16"></script>
+  <script type="module" src="rovina.js?v=17"></script>
 </body>
 </html>

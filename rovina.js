@@ -19,6 +19,11 @@ const dom = {
   portraitPlaceholder: document.querySelector("#portrait-placeholder"),
   portraitUpload: document.querySelector("#portrait-upload"),
   changePortrait: document.querySelector("#change-portrait"),
+  portraitCropDialog: document.querySelector("#portrait-crop-dialog"),
+  portraitCropStage: document.querySelector("#portrait-crop-stage"),
+  portraitCropImage: document.querySelector("#portrait-crop-image"),
+  portraitCropZoom: document.querySelector("#portrait-crop-zoom"),
+  portraitCropApply: document.querySelector("#portrait-crop-apply"),
   socialLinks: document.querySelector("#social-links"),
   socialNote: document.querySelector("#social-note"),
   hobbies: document.querySelector("#hobbies-list"),
@@ -44,6 +49,11 @@ const dom = {
 let supabase = null;
 let currentPortraitUrl = ROVINA_PROFILE.portraitUrl || null;
 let currentPortraitPath = null;
+let portraitCropUrl = null;
+let portraitCropDimensions = null;
+let portraitCropOffset = { x: 0, y: 0 };
+let portraitCropScale = 1;
+let portraitCropDrag = null;
 let selectedPhoto = null;
 let previewUrl = null;
 let toastTimer;
@@ -348,6 +358,112 @@ function clearSelectedPhoto() {
   dom.previewImage.removeAttribute("src");
 }
 
+function renderPortraitCrop() {
+  if (!portraitCropDimensions) return;
+  const stage = {
+    width: dom.portraitCropStage.clientWidth,
+    height: dom.portraitCropStage.clientHeight
+  };
+  const baseScale = Math.max(
+    stage.width / portraitCropDimensions.width,
+    stage.height / portraitCropDimensions.height
+  );
+  const scale = baseScale * Number(dom.portraitCropZoom.value);
+  const width = portraitCropDimensions.width * scale;
+  const height = portraitCropDimensions.height * scale;
+  if (portraitCropScale && scale !== portraitCropScale) {
+    const ratio = scale / portraitCropScale;
+    portraitCropOffset.x *= ratio;
+    portraitCropOffset.y *= ratio;
+  }
+  portraitCropScale = scale;
+  const maxX = Math.max(0, (width - stage.width) / 2);
+  const maxY = Math.max(0, (height - stage.height) / 2);
+  portraitCropOffset.x = Math.max(-maxX, Math.min(maxX, portraitCropOffset.x));
+  portraitCropOffset.y = Math.max(-maxY, Math.min(maxY, portraitCropOffset.y));
+  dom.portraitCropImage.style.width = `${width}px`;
+  dom.portraitCropImage.style.height = `${height}px`;
+  dom.portraitCropImage.style.left = `calc(50% + ${portraitCropOffset.x}px)`;
+  dom.portraitCropImage.style.top = `calc(50% + ${portraitCropOffset.y}px)`;
+  dom.portraitCropImage.style.transform = "translate(-50%, -50%)";
+}
+
+function openPortraitCrop(file) {
+  if (!ALLOWED_PHOTO_TYPES.has(file.type)) {
+    showToast("Choose a JPEG, PNG, WebP, or GIF image for Rovina's portrait.");
+    dom.portraitUpload.value = "";
+    return;
+  }
+  if (file.size > MAX_PHOTO_BYTES) {
+    showToast("That photo is over 5 MB. Choose a smaller one.");
+    dom.portraitUpload.value = "";
+    return;
+  }
+
+  portraitCropUrl = URL.createObjectURL(file);
+  portraitCropDimensions = null;
+  portraitCropOffset = { x: 0, y: 0 };
+  portraitCropScale = 1;
+  dom.portraitCropZoom.value = "1";
+  dom.portraitCropImage.onload = () => {
+    portraitCropDimensions = {
+      width: dom.portraitCropImage.naturalWidth,
+      height: dom.portraitCropImage.naturalHeight
+    };
+    dom.portraitCropDialog.showModal();
+    renderPortraitCrop();
+  };
+  dom.portraitCropImage.onerror = () => {
+    showToast("Could not open that image. Choose another photo.");
+    dom.portraitCropImage.removeAttribute("src");
+    URL.revokeObjectURL(portraitCropUrl);
+    portraitCropUrl = null;
+    portraitCropDimensions = null;
+    dom.portraitUpload.value = "";
+  };
+  dom.portraitCropImage.src = portraitCropUrl;
+}
+
+function createCroppedPortrait() {
+  if (!portraitCropDimensions) return Promise.resolve(null);
+  const stage = {
+    width: dom.portraitCropStage.clientWidth,
+    height: dom.portraitCropStage.clientHeight
+  };
+  const width = 1000;
+  const height = Math.round(width * stage.height / stage.width);
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const context = canvas.getContext("2d");
+  if (!context) return Promise.resolve(null);
+
+  const renderedWidth = portraitCropDimensions.width * portraitCropScale;
+  const renderedHeight = portraitCropDimensions.height * portraitCropScale;
+  const imageLeft = stage.width / 2 + portraitCropOffset.x - renderedWidth / 2;
+  const imageTop = stage.height / 2 + portraitCropOffset.y - renderedHeight / 2;
+  const sourceX = Math.max(0, -imageLeft / portraitCropScale);
+  const sourceY = Math.max(0, -imageTop / portraitCropScale);
+  const sourceWidth = Math.min(portraitCropDimensions.width - sourceX, stage.width / portraitCropScale);
+  const sourceHeight = Math.min(portraitCropDimensions.height - sourceY, stage.height / portraitCropScale);
+  context.drawImage(
+    dom.portraitCropImage,
+    sourceX, sourceY, sourceWidth, sourceHeight,
+    0, 0, width, height
+  );
+
+  return new Promise((resolve) => {
+    canvas.toBlob((blob) => {
+      if (!blob) {
+        resolve(null);
+        return;
+      }
+      const extension = blob.type === "image/webp" ? "webp" : "png";
+      resolve(new File([blob], `rovina-portrait.${extension}`, { type: blob.type }));
+    }, "image/webp", 0.9);
+  });
+}
+
 async function savePortrait(file) {
   if (!supabase) {
     showToast("The portrait uploader is not connected to Supabase yet.");
@@ -459,9 +575,56 @@ async function addPost(event) {
 }
 
 dom.changePortrait.addEventListener("click", () => dom.portraitUpload.click());
-dom.portraitUpload.addEventListener("change", async () => {
+dom.portraitUpload.addEventListener("change", () => {
   const file = dom.portraitUpload.files?.[0];
-  if (file) await savePortrait(file);
+  if (file) openPortraitCrop(file);
+});
+
+dom.portraitCropZoom.addEventListener("input", renderPortraitCrop);
+dom.portraitCropStage.addEventListener("pointerdown", (event) => {
+  if (!portraitCropDimensions) return;
+  portraitCropDrag = {
+    pointerId: event.pointerId,
+    x: event.clientX,
+    y: event.clientY,
+    offsetX: portraitCropOffset.x,
+    offsetY: portraitCropOffset.y
+  };
+  dom.portraitCropStage.setPointerCapture(event.pointerId);
+});
+dom.portraitCropStage.addEventListener("pointermove", (event) => {
+  if (!portraitCropDrag || portraitCropDrag.pointerId !== event.pointerId) return;
+  portraitCropOffset.x = portraitCropDrag.offsetX + event.clientX - portraitCropDrag.x;
+  portraitCropOffset.y = portraitCropDrag.offsetY + event.clientY - portraitCropDrag.y;
+  renderPortraitCrop();
+});
+dom.portraitCropStage.addEventListener("pointerup", () => { portraitCropDrag = null; });
+dom.portraitCropStage.addEventListener("pointercancel", () => { portraitCropDrag = null; });
+document.querySelector("#portrait-crop-cancel").addEventListener("click", () => dom.portraitCropDialog.close());
+dom.portraitCropDialog.addEventListener("close", () => {
+  dom.portraitCropImage.removeAttribute("src");
+  if (portraitCropUrl) URL.revokeObjectURL(portraitCropUrl);
+  portraitCropUrl = null;
+  portraitCropDimensions = null;
+  portraitCropDrag = null;
+  dom.portraitUpload.value = "";
+});
+dom.portraitCropApply.addEventListener("click", async () => {
+  dom.portraitCropApply.disabled = true;
+  try {
+    const croppedFile = await createCroppedPortrait();
+    if (!croppedFile) {
+      showToast("Could not crop that image. Please try another photo.");
+      return;
+    }
+    dom.portraitCropDialog.close();
+    await savePortrait(croppedFile);
+  } catch (error) {
+    console.error("Could not crop Rovina's portrait:", error);
+    showToast("Could not crop that image. Please try another photo.");
+  } finally {
+    dom.portraitCropApply.disabled = false;
+  }
 });
 
 dom.photoInput.addEventListener("change", () => {
