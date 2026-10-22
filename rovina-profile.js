@@ -1,7 +1,6 @@
 export const ROVINA_PROFILE = {
   name: "Rovina Maharani",
-  tagline: "Main character energy. The best person in the world.",
-  about: "A little page from lalisa's perspective.",
+  tagline: "The best person in the world.",
   portraitUrl: "./rovina-photo.jpg",
   hobbies: [
     "Reading",
@@ -29,12 +28,12 @@ export const ROVINA_PROFILE = {
   birthday: "09-19",
   birthplace: "Bogor, Indonesia",
   facts: [
-    "From Lalisa's POV: Rovina is one of the kindest people I know.",
+    "One of the kindest people I know.",
     "She's sweet to everyone—and she makes it feel effortless.",
     "She's seriously smart, but never makes anyone feel small.",
     "She has the softest heart and the best energy.",
     "She notices the little things that make people feel loved.",
-    "I'm lucky to have a friend who is this thoughtful."
+    "Lucky to have a friend who is this thoughtful."
   ],
   socials: {
     instagram: "https://www.instagram.com/rovina_utami/",

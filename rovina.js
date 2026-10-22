@@ -1,7 +1,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { createIcons, Camera, Heart, Trash2 } from "https://esm.sh/lucide@0.468.0";
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from "./config.js";
-import { ROVINA_PROFILE } from "./rovina-profile.js?v=9";
+import { ROVINA_PROFILE } from "./rovina-profile.js?v=10";
 
 const BUCKET = "friend-photos";
 const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
@@ -73,7 +73,7 @@ function showToast(message) {
 }
 
 function setText(selector, value) {
-  document.querySelector(selector).textContent = value;
+  document.querySelector(selector).textContent = value ?? "";
 }
 
 function appendItems(container, items, className, renderItem) {
