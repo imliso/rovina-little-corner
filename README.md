@@ -10,13 +10,13 @@ Buka folder proyek di VS Code dan gunakan **Live Server**, atau jalankan `python
 
 URL proyek dan kunci publik sudah disimpan di `config.js`. Kunci publik memang boleh dipakai di browser. Jangan pernah memasukkan kunci `service_role` atau secret key.
 
-Skema awal sudah dibuat. Untuk menambahkan tabel feed dan izin unggah tanpa login:
+Skema awal (`supabase/schema.sql`) sudah dibuat. Untuk menambahkan feed, reaksi, foto utama, dan izin unggah publik:
 
 1. Buka `supabase/public_feed_migration.sql`.
-2. Di Supabase, buka **SQL Editor → New query**, salin seluruh isi file, lalu pilih **Run**. Jika migrasi feed pernah dijalankan sebelumnya, jalankan ulang file yang sudah diperbarui ini untuk menambahkan tabel reaksi dan izin hapus.
-3. Muat ulang situs. Feed akan membaca postingan, menerima foto, menampilkan jumlah hati, dan membolehkan satu reaksi per browser.
+2. Di Supabase, buka **SQL Editor → New query**, salin seluruh isi file, lalu pilih **Run**. Jalankan file terbaru ini sekali. Jika pernah menjalankan versi sebelumnya atau upload foto ditolak oleh RLS, jalankan ulang seluruh file ini; tabel dan kebijakan akan diperbarui dengan aman.
+3. Setelah query berhasil, muat ulang situs. Folder `portrait/` kini diizinkan untuk upload dan penghapusan foto utama.
 
-**Perhatian:** tanpa login, siapa pun yang memiliki tautan situs dapat menambahkan, memberi hati, dan menghapus postingan atau foto mana pun. Penghapusan menampilkan konfirmasi, tetapi konfirmasi bukan pembatas akses. Hati dibatasi satu per browser dan dapat diakali dengan menghapus data browser. Jangan bagikan tautan ke publik jika feed hanya untuk lingkaran teman.
+**Perhatian:** tanpa login, siapa pun yang memiliki tautan situs dapat menambahkan postingan, mengganti foto utama Rovina, memberi hati, dan menghapus postingan/foto. Konfirmasi bukan pembatas akses. Hati dibatasi satu per browser dan dapat diakali dengan menghapus data browser. Jangan bagikan tautan ke publik jika situs hanya untuk lingkaran teman.
 
 ## Mengisi profil Rovina
 

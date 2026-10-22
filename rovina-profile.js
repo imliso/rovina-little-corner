@@ -1,7 +1,7 @@
 export const ROVINA_PROFILE = {
   name: "Rovina Maharani",
   tagline: "Main character energy. The best person in the world.",
-  about: "A little page from LALISA's perspective.",
+  about: "A little page from lalisa's perspective.",
   portraitUrl: "./rovina-photo.jpg",
   hobbies: [
     "Reading",
@@ -10,8 +10,8 @@ export const ROVINA_PROFILE = {
   ],
   music: [
     {
-      title: "Shepia",
-      artist: "SO7",
+      title: "Sephia",
+      artist: "Sheila On 7",
       spotifyUrl: "https://open.spotify.com/track/5gkTGkjFB5wAd3mSBEcQPY"
     }
   ],

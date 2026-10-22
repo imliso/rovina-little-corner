@@ -1,10 +1,11 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { createIcons, Heart, Trash2 } from "https://esm.sh/lucide@0.468.0";
+import { createIcons, Camera, Heart, Trash2 } from "https://esm.sh/lucide@0.468.0";
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from "./config.js";
-import { ROVINA_PROFILE } from "./rovina-profile.js?v=8";
+import { ROVINA_PROFILE } from "./rovina-profile.js?v=9";
 
 const BUCKET = "friend-photos";
 const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
+const ALLOWED_PHOTO_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
 const SOCIAL_LABELS = {
   instagram: "Instagram",
   tiktok: "TikTok",
@@ -16,6 +17,8 @@ const SOCIAL_LABELS = {
 const dom = {
   portrait: document.querySelector("#portrait"),
   portraitPlaceholder: document.querySelector("#portrait-placeholder"),
+  portraitUpload: document.querySelector("#portrait-upload"),
+  changePortrait: document.querySelector("#change-portrait"),
   socialLinks: document.querySelector("#social-links"),
   socialNote: document.querySelector("#social-note"),
   hobbies: document.querySelector("#hobbies-list"),
@@ -39,6 +42,8 @@ const dom = {
 };
 
 let supabase = null;
+let currentPortraitUrl = ROVINA_PROFILE.portraitUrl || null;
+let currentPortraitPath = null;
 let selectedPhoto = null;
 let previewUrl = null;
 let toastTimer;
@@ -71,6 +76,18 @@ function appendItems(container, items, className, renderItem) {
   }
 }
 
+function setPortrait(url) {
+  if (url) {
+    dom.portrait.src = url;
+    dom.portrait.hidden = false;
+    dom.portraitPlaceholder.hidden = true;
+  } else {
+    dom.portrait.removeAttribute("src");
+    dom.portrait.hidden = true;
+    dom.portraitPlaceholder.hidden = false;
+  }
+}
+
 function renderProfile() {
   document.title = `${ROVINA_PROFILE.name}'s Little Corner`;
   setText("#rovina-name-text", ROVINA_PROFILE.name);
@@ -79,11 +96,7 @@ function renderProfile() {
   dom.birthplace.textContent = ROVINA_PROFILE.birthplace ? `Born in ${ROVINA_PROFILE.birthplace}` : "";
   dom.birthplace.hidden = !ROVINA_PROFILE.birthplace;
 
-  if (ROVINA_PROFILE.portraitUrl) {
-    dom.portrait.src = ROVINA_PROFILE.portraitUrl;
-    dom.portrait.hidden = false;
-    dom.portraitPlaceholder.hidden = true;
-  }
+  setPortrait(currentPortraitUrl);
 
   const socialCount = Object.values(ROVINA_PROFILE.socials).filter(Boolean).length;
   dom.socialLinks.replaceChildren();
@@ -109,25 +122,29 @@ function renderProfile() {
     element.textContent = hobby;
   });
   appendItems(dom.music, ROVINA_PROFILE.music, "music-item", (element, song) => {
-    const title = document.createElement("button");
+    const title = document.createElement(song.spotifyUrl ? "a" : "span");
     title.className = "music-play-button";
-    title.type = "button";
     title.textContent = song.title;
     title.dataset.spotifyUrl = song.spotifyUrl || "";
-    title.setAttribute("aria-label", song.spotifyUrl ? `Open ${song.title} in the Spotify player` : song.title);
-    title.setAttribute("aria-pressed", "false");
+    title.setAttribute("aria-label", song.spotifyUrl ? `Open ${song.title} on Spotify` : song.title);
+    if (song.spotifyUrl) {
+      title.href = song.spotifyUrl;
+      title.target = "_blank";
+      title.rel = "noopener noreferrer";
+    }
     const artist = document.createElement("span");
     artist.textContent = song.artist;
     element.append(title, artist);
   });
   appendItems(dom.spotifyPlaylists, ROVINA_PROFILE.spotifyPlaylists, "spotify-playlist-item", (element, playlist) => {
-    const button = document.createElement("button");
+    const button = document.createElement("a");
     button.className = "playlist-play-button";
-    button.type = "button";
     button.textContent = playlist.title;
     button.dataset.spotifyUrl = playlist.url;
-    button.setAttribute("aria-label", `Play playlist ${playlist.title}`);
-    button.setAttribute("aria-pressed", "false");
+    button.href = playlist.url;
+    button.target = "_blank";
+    button.rel = "noopener noreferrer";
+    button.setAttribute("aria-label", `Open playlist ${playlist.title} on Spotify`);
     element.append(button);
   });
 
@@ -142,6 +159,27 @@ function renderProfile() {
       }
     } catch {
       dom.playlistLink.hidden = true;
+    }
+  } else {
+    const featuredTrack = ROVINA_PROFILE.music?.find((song) => song.spotifyUrl);
+    if (featuredTrack) {
+      try {
+        const trackUrl = new URL(featuredTrack.spotifyUrl);
+        const trackId = trackUrl.pathname.match(/^\/track\/([A-Za-z0-9]+)\/?$/)?.[1];
+        if (trackUrl.protocol === "https:" && trackUrl.hostname === "open.spotify.com" && trackId) {
+          dom.spotifyPlayer.src = `https://open.spotify.com/embed/track/${trackId}`;
+          dom.spotifyPlayer.title = `Spotify player for ${featuredTrack.title}`;
+          dom.spotifyEmbed.hidden = false;
+          dom.playlistLink.href = trackUrl.toString();
+          dom.playlistLink.textContent = "Open this track in Spotify ↗";
+          dom.playlistLink.hidden = false;
+          dom.music.querySelectorAll(".music-play-button").forEach((item) => {
+            item.setAttribute("aria-current", String(item.dataset.spotifyUrl === featuredTrack.spotifyUrl));
+          });
+        }
+      } catch {
+        dom.spotifyEmbed.hidden = true;
+      }
     }
   }
 
@@ -229,13 +267,12 @@ function renderPosts(posts) {
   dom.emptyFeed.hidden = posts.length > 0;
   dom.feedCount.textContent = `${posts.length} ${posts.length === 1 ? "MOMENT" : "MOMENTS"}`;
   for (const post of posts) dom.feed.insertBefore(makePostCard(post), dom.emptyFeed);
-  createIcons({ icons: { Heart, Trash2 } });
+  createIcons({ icons: { Camera, Heart, Trash2 } });
 
-  const featuredPhoto = ROVINA_PROFILE.portraitUrl || posts.find((post) => post.image_url)?.image_url;
+  const featuredPhoto = currentPortraitUrl || posts.find((post) => post.image_url)?.image_url;
   if (featuredPhoto) {
-    dom.portrait.src = featuredPhoto;
-    dom.portrait.hidden = false;
-    dom.portraitPlaceholder.hidden = true;
+    currentPortraitUrl = featuredPhoto;
+    setPortrait(featuredPhoto);
   }
 }
 
@@ -269,6 +306,25 @@ async function loadPosts() {
   })));
 }
 
+async function loadPortraitSetting() {
+  try {
+    const { data, error } = await supabase.from("friend_site_settings")
+      .select("portrait_url, portrait_path")
+      .eq("id", 1)
+      .maybeSingle();
+    if (error) {
+      console.info("Run the latest public feed migration to enable changing the portrait.");
+      return;
+    }
+    if (!data) return;
+    currentPortraitPath = data.portrait_path || null;
+    currentPortraitUrl = data.portrait_url || ROVINA_PROFILE.portraitUrl || null;
+    setPortrait(currentPortraitUrl);
+  } catch (error) {
+    console.warn("Could not load the saved portrait:", error.message);
+  }
+}
+
 function getVisitorId() {
   const storageKey = "rovina-feed-visitor-id";
   try {
@@ -290,6 +346,64 @@ function clearSelectedPhoto() {
   if (previewUrl) URL.revokeObjectURL(previewUrl);
   previewUrl = null;
   dom.previewImage.removeAttribute("src");
+}
+
+async function savePortrait(file) {
+  if (!supabase) {
+    showToast("The portrait uploader is not connected to Supabase yet.");
+    return;
+  }
+  if (!ALLOWED_PHOTO_TYPES.has(file.type)) {
+    showToast("Choose a JPEG, PNG, WebP, or GIF image for Rovina's portrait.");
+    return;
+  }
+  if (file.size > MAX_PHOTO_BYTES) {
+    showToast("That photo is over 5 MB. Choose a smaller one.");
+    return;
+  }
+  if (!window.confirm("Anyone with this link can change Rovina's public main photo. Continue?")) return;
+
+  dom.changePortrait.disabled = true;
+  dom.changePortrait.setAttribute("aria-busy", "true");
+  let uploadedPath = null;
+  const previousPath = currentPortraitPath;
+
+  try {
+    const extension = file.name.split(".").pop().toLowerCase().replace(/[^a-z0-9]/g, "") || "img";
+    uploadedPath = `portrait/${crypto.randomUUID()}.${extension}`;
+    const { error: uploadError } = await supabase.storage.from(BUCKET).upload(uploadedPath, file, {
+      cacheControl: "3600",
+      contentType: file.type,
+      upsert: false
+    });
+    if (uploadError) throw uploadError;
+
+    const imageUrl = supabase.storage.from(BUCKET).getPublicUrl(uploadedPath).data.publicUrl;
+    const { error: settingsError } = await supabase.from("friend_site_settings").upsert({
+      id: 1,
+      portrait_url: imageUrl,
+      portrait_path: uploadedPath,
+      updated_at: new Date().toISOString()
+    }, { onConflict: "id" });
+    if (settingsError) throw settingsError;
+
+    currentPortraitUrl = imageUrl;
+    currentPortraitPath = uploadedPath;
+    setPortrait(imageUrl);
+    if (previousPath && previousPath !== uploadedPath) {
+      const { error: cleanupError } = await supabase.storage.from(BUCKET).remove([previousPath]);
+      if (cleanupError) console.warn("Could not remove the previous portrait:", cleanupError.message);
+    }
+    showToast("Rovina's main photo has been updated for everyone.");
+  } catch (error) {
+    if (uploadedPath) await supabase.storage.from(BUCKET).remove([uploadedPath]);
+    console.error("Could not change Rovina's portrait:", error);
+    showToast("Could not save the new photo. Check the latest Supabase migration and try again.");
+  } finally {
+    dom.changePortrait.disabled = false;
+    dom.changePortrait.removeAttribute("aria-busy");
+    dom.portraitUpload.value = "";
+  }
 }
 
 async function addPost(event) {
@@ -344,12 +458,18 @@ async function addPost(event) {
   }
 }
 
+dom.changePortrait.addEventListener("click", () => dom.portraitUpload.click());
+dom.portraitUpload.addEventListener("change", async () => {
+  const file = dom.portraitUpload.files?.[0];
+  if (file) await savePortrait(file);
+});
+
 dom.photoInput.addEventListener("change", () => {
   const file = dom.photoInput.files?.[0];
   if (!file) return;
-  if (!file.type.startsWith("image/")) {
+  if (!ALLOWED_PHOTO_TYPES.has(file.type)) {
     clearSelectedPhoto();
-    showToast("Choose an image file for the post.");
+    showToast("Choose a JPEG, PNG, WebP, or GIF image for the post.");
     return;
   }
   if (file.size > MAX_PHOTO_BYTES) {
@@ -379,7 +499,7 @@ dom.music.addEventListener("click", (event) => {
     dom.playlistLink.href = trackUrl.toString();
     dom.playlistLink.textContent = "Open this track in Spotify ↗";
     dom.playlistLink.hidden = false;
-    dom.music.querySelectorAll(".music-play-button").forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
+    dom.music.querySelectorAll(".music-play-button").forEach((item) => item.setAttribute("aria-current", String(item === button)));
   } catch {
     showToast("Could not open this Spotify track.");
   }
@@ -400,8 +520,8 @@ dom.spotifyPlaylists.addEventListener("click", (event) => {
     dom.playlistLink.href = playlistUrl.toString();
     dom.playlistLink.textContent = "Open this playlist in Spotify ↗";
     dom.playlistLink.hidden = false;
-    dom.spotifyPlaylists.querySelectorAll(".playlist-play-button").forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
-    dom.music.querySelectorAll(".music-play-button").forEach((item) => item.setAttribute("aria-pressed", "false"));
+    dom.spotifyPlaylists.querySelectorAll(".playlist-play-button").forEach((item) => item.setAttribute("aria-current", String(item === button)));
+    dom.music.querySelectorAll(".music-play-button").forEach((item) => item.removeAttribute("aria-current"));
   } catch {
     showToast("Could not open this Spotify playlist.");
   }
@@ -472,16 +592,17 @@ dom.feed.addEventListener("click", async (event) => {
   button.setAttribute("aria-pressed", "true");
   button.classList.add("reacted");
   button.innerHTML = `<i data-lucide="heart" aria-hidden="true"></i><span>${count}</span>`;
-  createIcons({ icons: { Heart, Trash2 } });
+  createIcons({ icons: { Camera, Heart, Trash2 } });
   button.setAttribute("aria-label", `${count} hearts for this post`);
 });
 
 dom.form.addEventListener("submit", addPost);
 renderProfile();
+createIcons({ icons: { Camera, Heart, Trash2 } });
 
 if (SUPABASE_URL.startsWith("https://") && SUPABASE_ANON_KEY.length > 30) {
   supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  loadPosts();
+  loadPortraitSetting().then(loadPosts);
 } else {
   showToast("Add the Supabase URL and public key to config.js to enable the feed.");
 }

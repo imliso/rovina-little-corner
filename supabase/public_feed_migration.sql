@@ -1,4 +1,5 @@
--- Run this once in Supabase SQL Editor after the original schema.sql has succeeded.
+-- Run in Supabase SQL Editor after schema.sql has succeeded.
+-- Safe to rerun: this refreshes the feed, reactions, portrait settings, and storage policies.
 -- Feed posts and images are public. Anyone with the site link can upload them.
 
 create table if not exists public.friend_feed_posts (
@@ -37,13 +38,13 @@ drop policy if exists "Anyone can upload feed photos" on storage.objects;
 create policy "Anyone can upload feed photos"
   on storage.objects for insert
   to anon, authenticated
-  with check (bucket_id = 'friend-photos' and (storage.foldername(name))[1] = 'feed');
+  with check (bucket_id = 'friend-photos' and (storage.foldername(name))[1] in ('feed', 'portrait'));
 
 drop policy if exists "Anyone can delete feed photos" on storage.objects;
 create policy "Anyone can delete feed photos"
   on storage.objects for delete
   to anon, authenticated
-  using (bucket_id = 'friend-photos' and (storage.foldername(name))[1] = 'feed');
+  using (bucket_id = 'friend-photos' and (storage.foldername(name))[1] in ('feed', 'portrait'));
 
 create table if not exists public.friend_feed_reactions (
   post_id uuid not null references public.friend_feed_posts(id) on delete cascade,
@@ -66,3 +67,28 @@ create policy "Anyone can react to Rovina feed posts"
   on public.friend_feed_reactions for insert
   to anon, authenticated
   with check (true);
+
+create table if not exists public.friend_site_settings (
+  id smallint primary key default 1 check (id = 1),
+  portrait_url text,
+  portrait_path text,
+  updated_at timestamptz not null default now()
+);
+
+alter table public.friend_site_settings enable row level security;
+grant select, insert, update on public.friend_site_settings to anon, authenticated;
+
+drop policy if exists "Anyone can read Rovina site settings" on public.friend_site_settings;
+create policy "Anyone can read Rovina site settings"
+  on public.friend_site_settings for select to anon, authenticated using (true);
+
+drop policy if exists "Anyone can set Rovina's portrait" on public.friend_site_settings;
+create policy "Anyone can set Rovina's portrait"
+  on public.friend_site_settings for insert to anon, authenticated
+  with check (id = 1);
+
+drop policy if exists "Anyone can update Rovina's portrait" on public.friend_site_settings;
+create policy "Anyone can update Rovina's portrait"
+  on public.friend_site_settings for update to anon, authenticated
+  using (id = 1)
+  with check (id = 1);

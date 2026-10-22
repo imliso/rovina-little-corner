@@ -67,6 +67,9 @@ a { color: inherit; }
 .portrait-placeholder strong { z-index: 1; font: 700 29px/.98 var(--serif); }
 .portrait-placeholder small { z-index: 1; margin-top: 14px; font: 400 8px/1.4 var(--mono); }
 .photo-caption { position: absolute; right: 0; bottom: 0; left: 0; padding: 12px 5px 5px; background: linear-gradient(transparent, rgba(28,20,46,.68)); color: #fff; font: 400 8px/1.4 var(--mono); letter-spacing: .6px; text-align: center; }
+.change-portrait { position: absolute; z-index: 2; top: 10px; left: 10px; display: inline-flex; min-height: 32px; align-items: center; gap: 6px; padding: 6px 10px; border: 1px solid rgba(255,255,255,.58); border-radius: 99px; background: rgba(48,43,64,.76); color: #fff; cursor: pointer; font-size: 9px; font-weight: 700; backdrop-filter: blur(4px); }
+.change-portrait:hover { background: rgba(81,61,125,.92); }
+.change-portrait .lucide { width: 14px; height: 14px; }
 .sticker { position: absolute; z-index: 2; display: grid; place-content: center; width: 76px; height: 76px; border: 1px solid var(--ink); border-radius: 50%; font: 700 10px/1.2 var(--display); text-align: center; }
 .sticker-top { top: 24px; right: -29px; transform: rotate(10deg); background: var(--lime); }
 .sticker-bottom { bottom: 19px; left: -34px; transform: rotate(-12deg); background: var(--peach); }
@@ -100,18 +103,18 @@ h1 span { color: var(--purple); }
 .hobby-tag { padding: 7px 10px; border: 1px solid rgba(81,61,125,.22); border-radius: 99px; background: rgba(255,253,249,.64); color: #51436e; font-size: 10px; line-height: 1.4; }
 .music-list { display: grid; gap: 9px; }
 .music-item { display: flex; justify-content: space-between; gap: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(81,61,125,.13); font-size: 10px; }
-.music-play-button { padding: 0; border: 0; background: transparent; color: var(--ink); cursor: pointer; font-size: 10px; font-weight: 700; text-align: left; }
+.music-play-button { padding: 0; border: 0; background: transparent; color: var(--ink); cursor: pointer; font-size: 10px; font-weight: 700; text-align: left; text-decoration: none; }
 .music-play-button::before { content: "▶"; margin-right: 7px; color: var(--purple); font-size: 8px; }
 .music-play-button:hover { color: var(--plum); text-decoration: underline; text-underline-offset: 3px; }
-.music-play-button[aria-pressed="true"]::before { content: "♫"; }
+.music-play-button[aria-current="true"]::before { content: "♫"; }
 .music-item span { color: var(--muted); text-align: right; }
 .playlist-library { margin-top: 17px; }
 .playlist-library .panel-kicker { margin-bottom: 8px; }
 .spotify-playlist-list { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
 .spotify-playlist-item { margin: 0; }
-.playlist-play-button { max-width: 100%; padding: 6px 9px; border: 1px solid #d8cee9; border-radius: 99px; background: rgba(255,253,249,.8); color: var(--plum); cursor: pointer; font: 500 8px/1.35 var(--mono); overflow-wrap: anywhere; }
+.playlist-play-button { display: inline-block; max-width: 100%; padding: 6px 9px; border: 1px solid #d8cee9; border-radius: 99px; background: rgba(255,253,249,.8); color: var(--plum); cursor: pointer; font: 500 8px/1.35 var(--mono); overflow-wrap: anywhere; text-decoration: none; }
 .playlist-play-button::before { content: "▶"; margin-right: 5px; color: var(--purple); font-size: 7px; }
-.playlist-play-button:hover, .playlist-play-button[aria-pressed="true"] { border-color: var(--purple); background: var(--lilac); }
+.playlist-play-button:hover, .playlist-play-button[aria-current="true"] { border-color: var(--purple); background: var(--lilac); }
 .playlist-link { display: inline-block; margin-top: 13px; color: var(--plum); font: 500 9px/1.4 var(--mono); text-underline-offset: 3px; }
 .playlist-link[hidden] { display: none; }
 .spotify-embed { margin-top: 14px; overflow: hidden; border-radius: 8px; }
